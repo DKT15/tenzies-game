@@ -2,10 +2,26 @@ import React from "react";
 import "./App.css";
 import Die from "./Die";
 import { nanoid } from "nanoid";
+import Confetti from "react-confetti";
 
 function App() {
   // initialising allNewDice in useState, so it displays when the app loads.
   const [dice, setDice] = React.useState(allNewDice());
+  const [tenzies, setTenzies] = React.useState(false);
+
+  // useEffect is good at syncing multiple states.
+  // runs every time the dice state array changes.
+  React.useEffect(() => {
+    //.every() looks for every item in the array returning true so that the actual method can return true.
+    // if every die has an isHeld property as true, .every returns true. If not the .every will return false.
+    const allHeld = dice.every((die) => die.isHeld);
+    const firstValue = dice[0].value; //this is a reference to check against all the values. By checking against the first value in the dice array based on what the user has clicked.
+    const allSameValue = dice.every((die) => die.value === firstValue); //check if each die.value is equal to the first value.
+    // if the dice are all being held and are all the same value, setTenzies to true and tell the user that they won.
+    if (allHeld && allSameValue) {
+      setTenzies(true);
+    }
+  }, [dice]);
 
   // Helper function that is used in appropriate places in the code.
   // value gets a random number between 1 and 6.
@@ -30,12 +46,19 @@ function App() {
 
   // when rollDice is clicked, it looks through the existing roll. If the die is being held,
   // it is kept in the array but if it is not held then a new dice is generated to be added to the array.
+  // the dice is only rolled if the user doesn't have tenzies.
+  // If they do, setTenzies is set to false to reset and setDice to allNewDice() to get new dice.
   function rollDice() {
-    setDice((oldDice) =>
-      oldDice.map((die) => {
-        return die.isHeld ? die : generateNewDie();
-      })
-    );
+    if (!tenzies) {
+      setDice((oldDice) =>
+        oldDice.map((die) => {
+          return die.isHeld ? die : generateNewDie();
+        })
+      );
+    } else {
+      setTenzies(false);
+      setDice(allNewDice());
+    }
   }
 
   // when clicked, flips the isHeld property based on the id.
@@ -60,9 +83,11 @@ function App() {
     />
   ));
 
-  //adding each diceElement to the container.
+  // adding each diceElement to the container.
+  // If tenzies is true, confetti will be rendered to the screen and the button text will chnage to "New Game"
   return (
     <main>
+      {tenzies && <Confetti />}
       <h1 className="title">Tenzies</h1>
       <p className="instructions">
         Roll until all dice are the same. Click each die to freeze it at its
@@ -70,7 +95,7 @@ function App() {
       </p>
       <div className="dice-container">{diceElements}</div>
       <button className="roll-dice" onClick={rollDice}>
-        Roll
+        {tenzies ? "New Game" : "Roll"}
       </button>
     </main>
   );
