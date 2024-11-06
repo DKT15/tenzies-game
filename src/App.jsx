@@ -62,11 +62,11 @@ function App() {
   }
 
   // when clicked, flips the isHeld property based on the id.
-  // If it is the same die with the id property that was passed into the function, the object will be updated and if not die will be returned. WHich is keeping the same object that was there before.
+  // If it is the same die with the id property that was passed into the function, the object will be updated and if not die will be returned. Which is keeping the same object that was there before.
   function holdDice(id) {
     setDice((oldDice) =>
       oldDice.map((die) => {
-        return die.id === id ? { ...die, isHeld: !die.isHeld } : die; //if the id's are equal. I take all of the properties from the original die and set the isHeld to be the opposite of die.isHeld bacause it is defaulted to false.
+        return die.id === id ? { ...die, isHeld: !die.isHeld } : die; //if the id's are equal. I take all of the properties from the original die and set the isHeld to be the opposite of die.isHeld because it is defaulted to false.
       })
     );
   }
@@ -84,7 +84,7 @@ function App() {
   ));
 
   // adding each diceElement to the container.
-  // If tenzies is true, confetti will be rendered to the screen and the button text will chnage to "New Game"
+  // If tenzies is true, confetti will be rendered to the screen and the button text will change to "New Game"
   return (
     <main>
       {tenzies && <Confetti />}
