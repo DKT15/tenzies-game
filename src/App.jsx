@@ -5,7 +5,7 @@ import { nanoid } from "nanoid";
 import Confetti from "react-confetti";
 
 function App() {
-  // initialising allNewDice in useState, so it displays when the app loads.
+  // Initialising allNewDice in useState, so it displays when the app loads.
   const [dice, setDice] = React.useState(allNewDice());
   const [tenzies, setTenzies] = React.useState(false);
 
