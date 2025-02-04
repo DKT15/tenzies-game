@@ -7,21 +7,10 @@ import Confetti from "react-confetti";
 function App() {
   // Initialising allNewDice in useState, so it displays when the app loads.
   const [dice, setDice] = React.useState(allNewDice());
-  const [tenzies, setTenzies] = React.useState(false);
 
-  // useEffect is good at syncing multiple states.
-  // runs every time the dice state array changes.
-  React.useEffect(() => {
-    //.every() looks for every item in the array returning true so that the actual method can return true.
-    // if every die has an isHeld property as true, .every returns true. If not the .every will return false.
-    const allHeld = dice.every((die) => die.isHeld);
-    const firstValue = dice[0].value; //this is a reference to check against all the values. By checking against the first value in the dice array based on what the user has clicked.
-    const allSameValue = dice.every((die) => die.value === firstValue); //check if each die.value is equal to the first value.
-    // if the dice are all being held and are all the same value, setTenzies to true and tell the user that they won.
-    if (allHeld && allSameValue) {
-      setTenzies(true);
-    }
-  }, [dice]);
+  const gameWon =
+    dice.every((die) => die.isHeld) &&
+    dice.every((die) => die.value === dice[0].value);
 
   // Helper function that is used in appropriate places in the code.
   // value gets a random number between 1 and 6.
@@ -49,7 +38,7 @@ function App() {
   // the dice is only rolled if the user doesn't have tenzies.
   // If they do, setTenzies is set to false to reset and setDice to allNewDice() to get new dice.
   function rollDice() {
-    if (!tenzies) {
+    if (!gameWon) {
       setDice((oldDice) =>
         oldDice.map((die) => {
           return die.isHeld ? die : generateNewDie();
@@ -95,7 +84,7 @@ function App() {
       </p>
       <div className="dice-container">{diceElements}</div>
       <button className="roll-dice" onClick={rollDice}>
-        {tenzies ? "New Game" : "Roll"}
+        {gameWon ? "New Game" : "Roll"}
       </button>
     </main>
   );
