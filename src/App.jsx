@@ -6,47 +6,50 @@ import Confetti from "react-confetti";
 
 function App() {
   // Initialising allNewDice in useState, so it displays when the app loads.
-  const [dice, setDice] = React.useState(allNewDice());
+  // adding a function before allNewDice, stops it from being rerun when the component is re-rendered.
+  const [dice, setDice] = React.useState(() => generateNewDice());
 
   const gameWon =
     dice.every((die) => die.isHeld) &&
     dice.every((die) => die.value === dice[0].value);
 
-  // Helper function that is used in appropriate places in the code.
+  // the Array constructor is used to return 10 numbers. .fill is used to fill every item in the array that we want
+  // It then maps through the array and fills it and gives it 10 numbers between 1 and 6,
+  // applying a isHeld and id property to each of those numbers.
   // value gets a random number between 1 and 6.
   // isHeld is automatically set to false. When the user clicks it will turn green and true.
   // random id is created for each element and is set to the key of the die.
-  function generateNewDie() {
-    return {
+  function generateNewDice() {
+    return new Array(10).fill(0).map(() => ({
       value: Math.ceil(Math.random() * 6),
       isHeld: false,
       id: nanoid(),
-    };
+    }));
   }
 
-  // loops 10 times throught numbers 1 to 6 and pushes the results to the newDice array and pushes generateNewDice when the game starts.
-  function allNewDice() {
-    const newDice = [];
-    for (let i = 0; i < 10; i++) {
-      newDice.push(generateNewDie());
-    }
-    return newDice;
-  }
+  // // loops 10 times through numbers 1 to 6 and pushes the results to the newDice array and pushes generateNewDice when the game starts.
+  // function allNewDice() {
+  //   const newDice = [];
+  //   for (let i = 0; i < 10; i++) {
+  //     newDice.push(generateNewDice());
+  //   }
+  //   return newDice;
+  // }
 
   // when rollDice is clicked, it looks through the existing roll. If the die is being held,
-  // it is kept in the array but if it is not held then a new dice is generated to be added to the array.
-  // the dice is only rolled if the user doesn't have tenzies.
-  // If they do, setTenzies is set to false to reset and setDice to allNewDice() to get new dice.
+  // it is kept in the array (keep the current die) but if it is not held then a new value of a die will be generated from 1 to 6.
+  // spread oprator is used to bring in all the die's current values.
+  // the dice is only rolled if the user hasn't won the game yet.
+  // If they have won the game the game setDice to allNewDice() to get new dice, to start a new game.
   function rollDice() {
     if (!gameWon) {
       setDice((oldDice) =>
-        oldDice.map((die) => {
-          return die.isHeld ? die : generateNewDie();
-        })
+        oldDice.map((die) =>
+          die.isHeld ? die : { ...die, value: Math.ceil(Math.random() * 6) }
+        )
       );
     } else {
-      setTenzies(false);
-      setDice(allNewDice());
+      setDice(generateNewDice());
     }
   }
 
@@ -73,10 +76,17 @@ function App() {
   ));
 
   // adding each diceElement to the container.
-  // If tenzies is true, confetti will be rendered to the screen and the button text will change to "New Game"
+  // If gameWon is true, confetti will be rendered to the screen and the button text will change to "New Game"
+  // Aria-live will announce a change in the content. When the game is won the para will be read out to the user.
+  // sr-only will indicate that the content is for screenreaders. It is hidden from users on the screen via the CSS but will be read out still.
   return (
     <main>
-      {tenzies && <Confetti />}
+      {gameWon && <Confetti />}
+      <div aria-live="polite" className="sr-only">
+        {gameWon && (
+          <p>Congratulations! You won! Press "New Game" to start again.</p>
+        )}
+      </div>
       <h1 className="title">Tenzies</h1>
       <p className="instructions">
         Roll until all dice are the same. Click each die to freeze it at its
