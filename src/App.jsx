@@ -9,9 +9,22 @@ function App() {
   // adding a function before allNewDice, stops it from being rerun when the component is re-rendered.
   const [dice, setDice] = React.useState(() => generateNewDice());
 
+  // ref is needed to target the DomNode. We use it in the useEffect.
+  const buttonRef = React.useRef(null);
+
+  // the game will be won once every dice is held (i.e. true) and
+  // every die value is equal to the first die value.
+  // e.g. every dice has the same number.
   const gameWon =
     dice.every((die) => die.isHeld) &&
     dice.every((die) => die.value === dice[0].value);
+
+  // this focuses the button to the new game button once the game has been won.
+  React.useEffect(() => {
+    if (gameWon) {
+      buttonRef.current.focus();
+    }
+  });
 
   // the Array constructor is used to return 10 numbers. .fill is used to fill every item in the array that we want
   // It then maps through the array and fills it and gives it 10 numbers between 1 and 6,
@@ -79,6 +92,7 @@ function App() {
   // If gameWon is true, confetti will be rendered to the screen and the button text will change to "New Game"
   // Aria-live will announce a change in the content. When the game is won the para will be read out to the user.
   // sr-only will indicate that the content is for screenreaders. It is hidden from users on the screen via the CSS but will be read out still.
+  // buttonRef applied to the button that will switch to new game was the game has been won.
   return (
     <main>
       {gameWon && <Confetti />}
@@ -93,7 +107,7 @@ function App() {
         current value between rolls.
       </p>
       <div className="dice-container">{diceElements}</div>
-      <button className="roll-dice" onClick={rollDice}>
+      <button ref={buttonRef} className="roll-dice" onClick={rollDice}>
         {gameWon ? "New Game" : "Roll"}
       </button>
     </main>
